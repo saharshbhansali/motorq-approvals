@@ -27,7 +27,7 @@ model Requests {
     workflowType String
     updatedAt DateTime @updatedAt
     // set 2 status: pending, reviwed
-    approvalStatus Approvals @relation(fields: [status], references: [id])
+    approval Approvals[]
     status   String
     requesterId String
     
@@ -40,9 +40,9 @@ model Approvals {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    request Requests[]
+    request Requests @relation(fields: [status], references: [id])
     // set 3 status: require_justification, approved, rejected
-    status   String  @db.VarChar(255) 
+    status   String  @db.VarChar(255)
     approverId String
 
     @@index([approverId])
