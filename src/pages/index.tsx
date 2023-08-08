@@ -12,7 +12,6 @@ export default function Home() {
 
   const {requests} = api.requests.getAll.useQuery();
   const {approvals} = api.approvals.getAll.useQuery();
-  console.log(requests, approvals);
 
   return (
     <>
@@ -22,18 +21,30 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        {!user.isSignedIn &&
-        <SignInButton mode="modal">
-          <button className="btn">
-            Sign in
-          </button>
-        </SignInButton>}
-        {!!user.isSignedIn && <SignOutButton>
-          <button className="btn">
-            Sign Out
-          </button>
-        </SignOutButton>}
-        <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+        <div>
+          {!user.isSignedIn &&
+          <SignInButton mode="modal">
+            <button className="btn">
+              Sign in
+            </button>
+          </SignInButton>}
+          {!!user.isSignedIn && <SignOutButton>
+            <button className="btn">
+              Sign Out
+            </button>
+          </SignOutButton>}
+          <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+        </div>
+        <div>
+          {requests?.map((request) => (
+            <div key={request.id}>{request.status}<br></br>{request.status}</div>
+          ))}
+        </div>
+        <div>
+          {approvals?.map((approval) => (
+            <div key={approval.id}>{approval.status}<br></br>{approval.status}</div>
+          ))}
+        </div>
       </main>
     </>
   );
