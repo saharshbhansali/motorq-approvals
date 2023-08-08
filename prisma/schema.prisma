@@ -22,23 +22,42 @@ model Requests {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String  @db.VarChar(255)
+    attachments String
+    workflow Workflows @relation(fields: [workflowType], references: [id])
+    workflowType String
     updatedAt DateTime @updatedAt
     // set 2 status: pending, reviwed
-    status   String  @db.VarChar(255)
+    approvalStatus Approvals @relation(fields: [status], references: [id])
+    status   String
     requesterId String
     
     @@index([requesterId])
     @@index([status])
+    @@index([workflowType])
 }
 
 model Approvals {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    request Requests[]
     // set 3 status: require_justification, approved, rejected
     status   String  @db.VarChar(255) 
     approverId String
 
     @@index([approverId])
     @@index([status])
+}
+
+model Workflows {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    // set 3 types: everyone, anyone, min_two
+    type   String  @db.VarChar(255) 
+    adminId String
+    requests Requests[]
+
+    @@index([adminId])
+    @@index([type])
 }

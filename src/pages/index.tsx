@@ -3,19 +3,44 @@ import { SignInButton } from "@clerk/nextjs";
 import Head from "next/head";
 import Link from "next/link";
 import { use } from "react";
+import { object } from "zod";
 import { api } from "~/utils/api";
+
+const CreateRequestWizard = () => {
+  const {user} = useUser();
+  if (!user) return null;
+
+  return (
+    <div>
+      <img src={user.imageUrl} alt="profile image"/>
+    </div>
+  );
+}
+
+const ApproveRequestWizard = () => {
+  const {user} = useUser();
+  if (!user) return null;
+
+  return (
+    <div>
+      <img src={user.imageUrl} alt="profile image"/>
+    </div>
+  );
+}
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   const user = useUser();
 
-  const {data: requests} = api.requests.getAll.useQuery();
+  const {data: requests, isLoading:req_isLoading} = api.requests.getAll.useQuery();
   // const {data} = api.approvals.getAll.useQuery();
-  const {data: approvals} = api.approvals.getAll.useQuery();
+  const {data: approvals, isLoading: app_isLoading} = api.approvals.getAll.useQuery();
 
-  if (!requests) return <div>Loading Requests...</div>;
-  if (!approvals) return <div>Loading Approvals...</div>;
+  if (req_isLoading) return <div>Loading...</div>;
+  if (app_isLoading) return <div>Loading...</div>;
+  if (!requests) return <div>Something went wrong</div>;
+  if (!approvals) return <div>Something went wrong</div>;;
 
   return (
     <>
@@ -33,22 +58,20 @@ export default function Home() {
               <div className="flex justify-center">Sign in</div>
             </button>
           </SignInButton>}
-          {!!user.isSignedIn && <SignOutButton>
-            <button className="btn">
-            <div className="flex justify-center">Sign out</div>
-            </button>
-          </SignOutButton>}
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+        </div>
+        <div className="flex justify-center border-b border-slate-400">
+          {user.isSignedIn && <CreateRequestWizard />}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Requests:</div>
-          {[...requests!,]?.map((request) => (
+          {[...requests,]?.map((request) => (
             <div className="justify-center border-b p-8 border-slate-400" key={request.id}>{request.status} - {request.content} (request id: {request.id})<br></br>Requested by: {request.requesterId}<br></br></div>
           ))}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Approvals:</div>
-          {[...approvals!,]?.map((approval) => (
+          {[...approvals,]?.map((approval) => (
             <div className="justify-center border-b p-8 border-slate-400" key={approval.id}>{approval.id} - {approval.status}<br></br>Approved by {approval.approverId}<br></br></div>
           ))}
         </div>
