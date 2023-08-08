@@ -4,7 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { use } from "react";
 import { object } from "zod";
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 const CreateRequestWizard = () => {
   const {user} = useUser();
@@ -33,11 +33,56 @@ const CreateWorkflowWizard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex p-2">
-      <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full"/>
+    <div className="flex w-full">
+      <div className="flex p-4 justify-start border-b border-slate-600">
+        <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full justify-start"/>
+      </div>
+      <br />
+      <div className="flex p-4 justify-center">
+        <input placeholder="Enter New Workflow Type" className="grow bg-transparent outline-none"></input>
+      </div>
     </div>
   );
 }
+
+type RequestWithRequester = RouterOutputs["requests"]["getAll"][number];
+const RequestView = (props: RequestWithRequester) => {
+  const {request, requester} = props;
+  return (
+    <div className="justify-center border-b p-8 border-slate-400" key={request.id}>
+      Request ID: {request.id}<br />
+      Request Content:
+      <div className="flex justify-center">{request.content}</div>
+      Status: {request.status}<br />Workflow Type: {request.workflow.type}<br />
+      Requester: {requester?.id}<br />
+    </div>
+  );
+};
+
+type ApprovalWithApprover = RouterOutputs["approvals"]["getAll"][number];
+const ApprovalView = (props: ApprovalWithApprover) => {
+  const {approval, approver} = props;
+  return (
+    <div className="justify-center border-b p-8 border-slate-400" key={approval.id}>
+      Approval ID: {approval.id}<br />
+      Status: {approval.status}<br />Workflow Type: {approval.request.status}<br />
+      Approver: {approver?.id}<br />
+    </div>
+  );
+};
+
+type WorkflowWithCreator = RouterOutputs["workflows"]["getAll"][number];
+const WorkflowView = (props: WorkflowWithCreator) => {
+  const {workflow, creator} = props;
+  return (
+    <div className="justify-center border-b p-8 border-slate-400" key={workflow.id}>
+      Workflow ID: {workflow.id}<br />
+      Workflow Type: {workflow.type}<br />
+      Creator: {creator?.id}<br />
+    </div>
+  );
+};
+
 
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -73,25 +118,25 @@ export default function Home() {
           </SignInButton>}
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
         </div>
-        <div className="flex justify-center border-b border-slate-400">
-          {user.isSignedIn && <CreateRequestWizard />}
+        <div className="border-b border-slate-400">
+          {user.isSignedIn && <CreateWorkflowWizard />}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Requests:</div>
-          {[...requests,]?.map((request) => (
-            <div className="justify-center border-b p-8 border-slate-400" key={request.id}>Request ID: {request.id}<br></br>Request Content: <br></br>{request.content}<br></br>Status: {request.status}<br></br>Workflow type: {request.workflow.type}<br></br>Requester: {request.requesterId}<br></br></div>
+          {[...requests,]?.map((fullRequest) => (
+            <RequestView {...fullRequest} key={fullRequest.request.id}/>
           ))}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Approvals:</div>
-          {[...approvals,]?.map((approval) => (
-            <div className="justify-center border-b p-8 border-slate-400" key={approval.id}>Approval ID: {approval.id}<br></br>For Request: {approval.status}<br></br>With Status: {approval.request.status}<br></br>Approver: {approval.approverId}<br></br></div>
+          {[...approvals,]?.map((fullApproval) => (
+            <ApprovalView {...fullApproval} key={fullApproval.approval.id}/>
           ))}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Workflows:</div>
-          {[...workflows,]?.map((workflow) => (
-            <div className="justify-center border-b p-8 border-slate-400" key={workflow.id}>{workflow.id}<br></br>{workflow.type}<br></br>Creator: {workflow.adminId}<br></br></div>
+          {[...workflows,]?.map((fullWorkflow) => (
+            <WorkflowView {...fullWorkflow} key={fullWorkflow.workflow.id}/>
           ))}
         </div>
         </div>
