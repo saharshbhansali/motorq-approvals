@@ -18,6 +18,19 @@ generator client {
 //     updatedAt DateTime @updatedAt
 // }
 
+model Workflows {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    // set 3 types: everyone, anyone, min_two
+    type   String  @db.VarChar(255) 
+    adminId String
+    requests Requests[]
+
+    @@index([adminId])
+    @@index([type])
+}
+
 model Requests {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
@@ -47,17 +60,4 @@ model Approvals {
 
     @@index([approverId])
     @@index([status])
-}
-
-model Workflows {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    // set 3 types: everyone, anyone, min_two
-    type   String  @db.VarChar(255) 
-    adminId String
-    requests Requests[]
-
-    @@index([adminId])
-    @@index([type])
 }

@@ -11,8 +11,8 @@ const CreateRequestWizard = () => {
   if (!user) return null;
 
   return (
-    <div>
-      <img src={user.imageUrl} alt="profile image"/>
+    <div className="flex p-2">
+      <img src={user.imageUrl} alt="profile image"  className="w-12 h-12 rounded-full"/>
     </div>
   );
 }
@@ -22,8 +22,19 @@ const ApproveRequestWizard = () => {
   if (!user) return null;
 
   return (
-    <div>
-      <img src={user.imageUrl} alt="profile image"/>
+    <div className="flex p-2">
+      <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full"/>
+    </div>
+  );
+}
+
+const CreateWorkflowWizard = () => {
+  const {user} = useUser();
+  if (!user) return null;
+
+  return (
+    <div className="flex p-2">
+      <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full"/>
     </div>
   );
 }
@@ -34,13 +45,15 @@ export default function Home() {
   const user = useUser();
 
   const {data: requests, isLoading:req_isLoading} = api.requests.getAll.useQuery();
-  // const {data} = api.approvals.getAll.useQuery();
   const {data: approvals, isLoading: app_isLoading} = api.approvals.getAll.useQuery();
+  const {data: workflows, isLoading: wf_isLoading} = api.workflows.getAll.useQuery();
 
-  if (req_isLoading) return <div>Loading...</div>;
-  if (app_isLoading) return <div>Loading...</div>;
-  if (!requests) return <div>Something went wrong</div>;
-  if (!approvals) return <div>Something went wrong</div>;;
+  if (req_isLoading) return <div>Loading Requests...</div>;
+  if (app_isLoading) return <div>Loading Approvals...</div>;
+  if (wf_isLoading) return <div>Loading Workflows...</div>;
+  if (!requests) return <div>Something went wrong with Requests</div>;
+  if (!approvals) return <div>Something went wrong with Approvals</div>;
+  if (!workflows) return <div>Something went wrong with Workflows</div>;
 
   return (
     <>
@@ -66,13 +79,19 @@ export default function Home() {
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Requests:</div>
           {[...requests,]?.map((request) => (
-            <div className="justify-center border-b p-8 border-slate-400" key={request.id}>{request.status} - {request.content} (request id: {request.id})<br></br>Requested by: {request.requesterId}<br></br></div>
+            <div className="justify-center border-b p-8 border-slate-400" key={request.id}>Request ID: {request.id}<br></br>Request Content: <br></br>{request.content}<br></br>Status: {request.status}<br></br>Workflow type: {request.workflow.type}<br></br>Requester: {request.requesterId}<br></br></div>
           ))}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Approvals:</div>
           {[...approvals,]?.map((approval) => (
-            <div className="justify-center border-b p-8 border-slate-400" key={approval.id}>{approval.id} - {approval.status}<br></br>Approved by {approval.approverId}<br></br></div>
+            <div className="justify-center border-b p-8 border-slate-400" key={approval.id}>Approval ID: {approval.id}<br></br>For Request: {approval.status}<br></br>With Status: {approval.request.status}<br></br>Approver: {approval.approverId}<br></br></div>
+          ))}
+        </div>
+        <div className="flex flex-col">
+          <div className="justify-center border-b p-8 border-slate-400"> Workflows:</div>
+          {[...workflows,]?.map((workflow) => (
+            <div className="justify-center border-b p-8 border-slate-400" key={workflow.id}>{workflow.id}<br></br>{workflow.type}<br></br>Creator: {workflow.adminId}<br></br></div>
           ))}
         </div>
         </div>

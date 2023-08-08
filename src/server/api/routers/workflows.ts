@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const approvalsRouter = createTRPCRouter({
+export const workflowsRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.approvals.findMany({
+    return ctx.prisma.workflows.findMany({
         include: {
-            request: true,
+            requests: true,
         },
     });
   }),
