@@ -10,8 +10,8 @@ export default function Home() {
 
   const user = useUser();
 
-  const {requests} = api.requests.getAll.useQuery();
-  const {approvals} = api.approvals.getAll.useQuery();
+  const {data} = api.requests.getAll.useQuery();
+  // const {data} = api.approvals.getAll.useQuery();
 
   return (
     <>
@@ -36,15 +36,15 @@ export default function Home() {
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
         </div>
         <div>
-          {requests?.map((request) => (
-            <div key={request.id}>{request.status}<br></br>{request.status}</div>
+          {data?.map((request) => (
+            <div key={request.id}>{request.status} - {request.content}<br></br></div>
           ))}
         </div>
-        <div>
+        {/* <div>
           {approvals?.map((approval) => (
             <div key={approval.id}>{approval.status}<br></br>{approval.status}</div>
           ))}
-        </div>
+        </div> */}
       </main>
     </>
   );
