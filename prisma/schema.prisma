@@ -12,8 +12,33 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Example {
+// model Example {
+//     id        String   @id @default(cuid())
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+model Requests {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    content   String  @db.VarChar(255)
+    updatedAt DateTime @updatedAt
+    // set 2 status: pending, reviwed
+    status   String  @db.VarChar(255)
+    requesterId String
+    
+    @@index([requesterId])
+    @@index([status])
+}
+
+model Approvals {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    // set 3 status: require_justification, approved, rejected
+    status   String  @db.VarChar(255) 
+    approverId String
+
+    @@index([approverId])
+    @@index([status])
 }

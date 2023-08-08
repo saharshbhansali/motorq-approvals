@@ -6,9 +6,13 @@ import { use } from "react";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   const user = useUser();
+
+  const {requests} = api.requests.getAll.useQuery();
+  const {approvals} = api.approvals.getAll.useQuery();
+  console.log(requests, approvals);
 
   return (
     <>
