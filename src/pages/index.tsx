@@ -2,8 +2,9 @@ import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import Head from "next/head";
 import Link from "next/link";
-import { use } from "react";
+import React, { use, useState } from "react";
 import { object } from "zod";
+import { LoadingSpinner } from "~/components/loading";
 import { api } from "~/utils/api";
 
 const CreateRequestWizard = () => {
@@ -30,6 +31,10 @@ const ApproveRequestWizard = () => {
 
 const CreateWorkflowWizard = () => {
   const {user} = useUser();
+  const [textIn, setInput] = React.useState<string>("");
+
+  const {mutate: createWorkflow} = api.workflows.create.useMutation();
+
   if (!user) return null;
 
   return (
@@ -38,8 +43,15 @@ const CreateWorkflowWizard = () => {
         <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full justify-start"/>
       </div>
       <br />
-      <div className="flex p-4 justify-center">
-        <input placeholder="Enter New Workflow Type" className="grow bg-transparent outline-none"></input>
+      <div className="flex p-4 justify-center w-full">
+        <input 
+          placeholder="Enter New Workflow Type" 
+          className="grow bg-transparent outline-none"
+          type="text"
+          value={textIn}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button onClick={() => createWorkflow({type: textIn})}>Upload</button>
       </div>
     </div>
   );
@@ -48,15 +60,15 @@ const CreateWorkflowWizard = () => {
 export default function Home() {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
-  const user = useUser();
-
+  const {user, isLoaded: userLoaded, isSignedIn: signIn} = useUser();
+  if (!userLoaded) return <LoadingSpinner />
   const {data: requests, isLoading:req_isLoading} = api.requests.getAll.useQuery();
   const {data: approvals, isLoading: app_isLoading} = api.approvals.getAll.useQuery();
   const {data: workflows, isLoading: wf_isLoading} = api.workflows.getAll.useQuery();
 
-  if (req_isLoading) return <div>Loading Requests...</div>;
-  if (app_isLoading) return <div>Loading Approvals...</div>;
-  if (wf_isLoading) return <div>Loading Workflows...</div>;
+  if (req_isLoading) return <LoadingSpinner />// <div>Loading Requests...</div>;
+  if (app_isLoading) return <LoadingSpinner />// <div>Loading Approvals...</div>;
+  if (wf_isLoading) return <LoadingSpinner />// <div>Loading Workflows...</div>;
   if (!requests) return <div>Something went wrong with Requests</div>;
   if (!approvals) return <div>Something went wrong with Approvals</div>;
   if (!workflows) return <div>Something went wrong with Workflows</div>;
@@ -71,7 +83,7 @@ export default function Home() {
       <main className="flex justify-center h-screen">
         <div className="w-full md:max-w-2xl border-x border-slate-400">
         <div className="flex border-b border-slate-400 p-4">
-          {!user.isSignedIn &&
+          {!signIn &&
           <SignInButton mode="modal">
             <button className="btn">
               <div className="flex justify-center">Sign in</div>
@@ -80,7 +92,7 @@ export default function Home() {
           <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
         </div>
         <div className="border-b border-slate-400">
-          {user.isSignedIn && <CreateWorkflowWizard />}
+          {signIn && <CreateWorkflowWizard />}
         </div>
         <div className="flex flex-col">
           <div className="justify-center border-b p-8 border-slate-400"> Requests:</div>
