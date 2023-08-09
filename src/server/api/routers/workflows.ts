@@ -5,8 +5,9 @@ export const workflowsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const workflows = await ctx.prisma.workflows.findMany({
       take: 100,
+      orderBy: {createdAt: "desc"},
       include: {
-          requests: true,
+        requests: true,
       },
     });
 

@@ -9,6 +9,58 @@ import { api } from "~/utils/api";
 
 const CreateRequestWizard = () => {
   const {user} = useUser();
+  // const [textIn, setInput] = useState("");
+  // const ctx = api.useContext();
+
+  // const {mutate: createRequest, isLoading: isUploading} = api.requests.create.useMutation({
+  //   onSuccess: () => {
+  //     setInput("");
+  //     void ctx.workflows.getAll.invalidate();
+  //   }
+
+  // });
+
+  // if (!user) return null;
+
+  // return (
+  //   <div className="flex w-full">
+  //     <div className="flex p-4 justify-start border-b border-slate-600">
+  //       <img src={user.imageUrl} alt="profile image" className="w-12 h-12 rounded-full justify-start"/>
+  //     </div>
+  //     <br />
+  //     <div className="flex p-4 justify-center w-full">
+  //       <input 
+  //         placeholder="Enter New Workflow Type" 
+  //         className="grow bg-transparent outline-none"
+  //         type="text"
+  //         value={textIn}
+  //         onChange={(e) => setInput(e.target.value)}
+  //         disabled = {isUploading}
+  //       />
+  //     </div>
+  //     <div className="flex p-4 justify-center w-full">
+  //       <input 
+  //         placeholder="Enter New Workflow Type" 
+  //         className="grow bg-transparent outline-none"
+  //         type="text"
+  //         value={textIn}
+  //         onChange={(e) => setInput(e.target.value)}
+  //         disabled = {isUploading}
+  //       />
+  //     </div>
+  //     <div className="flex p-4 justify-center w-full">
+  //       <input 
+  //         placeholder="Enter New Workflow Type" 
+  //         className="grow bg-transparent outline-none"
+  //         type="text"
+  //         value={textIn}
+  //         onChange={(e) => setInput(e.target.value)}
+  //         disabled = {isUploading}
+  //       />
+  //       <button onClick={() => createRequest({: textIn})}>Upload</button>
+  //     </div>
+  //   </div>
+  // );
   if (!user) return null;
 
   return (
@@ -31,9 +83,16 @@ const ApproveRequestWizard = () => {
 
 const CreateWorkflowWizard = () => {
   const {user} = useUser();
-  const [textIn, setInput] = React.useState<string>("");
+  const [textIn, setInput] = useState("");
+  const ctx = api.useContext();
 
-  const {mutate: createWorkflow} = api.workflows.create.useMutation();
+  const {mutate: createWorkflow, isLoading: isUploading} = api.workflows.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.workflows.getAll.invalidate();
+    }
+
+  });
 
   if (!user) return null;
 
@@ -50,6 +109,7 @@ const CreateWorkflowWizard = () => {
           type="text"
           value={textIn}
           onChange={(e) => setInput(e.target.value)}
+          disabled = {isUploading}
         />
         <button onClick={() => createWorkflow({type: textIn})}>Upload</button>
       </div>

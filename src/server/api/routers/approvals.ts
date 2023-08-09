@@ -4,9 +4,11 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/ap
 export const approvalsRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const approvals = await ctx.prisma.approvals.findMany({
-        include: {
-            request: true,
-        },
+      take: 100,
+      orderBy: {createdAt: "desc"},
+      include: {
+        request: true,
+      },
     });
 
     return approvals;
